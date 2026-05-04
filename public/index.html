@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gunix SRL</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:13px;background:#f5f5f5;color:#1a1a1a}
+.app{display:flex;height:100vh}
+.sidebar{width:190px;background:#fff;border-right:1px solid #e5e5e5;display:flex;flex-direction:column;flex-shrink:0}
+.logo{padding:16px;border-bottom:1px solid #e5e5e5}
+.logo h1{font-size:15px;font-weight:700;color:#1D9E75}
+.logo p{font-size:10px;color:#888;margin-top:2px}
+.nav-section{font-size:10px;color:#aaa;padding:12px 14px 4px;text-transform:uppercase;letter-spacing:.06em}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:12px;color:#666;border-left:2px solid transparent}
+.nav-item:hover{background:#f8f8f8;color:#1a1a1a}
+.nav-item.active{color:#1a1a1a;border-left-color:#1D9E75;background:#f0faf6;font-weight:600}
+.nav-item.gerencia-only{border-left-color:transparent}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#fff;border-bottom:1px solid #e5e5e5}
+.topbar h2{font-size:15px;font-weight:600}
+.content{flex:1;overflow-y:auto;padding:16px}
+.btn{padding:6px 12px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:12px;color:#333}
+.btn:hover{background:#f5f5f5}
+.btn-green{background:#1D9E75;color:#fff;border-color:#0F6E56}
+.btn-green:hover{background:#0F6E56}
+.btn-sm{padding:4px 10px;font-size:11px}
+.cards-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.metric-card{background:#fff;border:1px solid #e5e5e5;border-radius:8px;padding:12px 14px}
+.metric-card label{display:block;font-size:11px;color:#888;margin-bottom:4px}
+.metric-card .val{font-size:22px;font-weight:700}
+.metric-card .sub{font-size:11px;color:#aaa;margin-top:2px}
+.card{background:#fff;border:1px solid #e5e5e5;border-radius:8px;padding:14px;margin-bottom:14px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-header h3{font-size:13px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:7px 10px;font-weight:600;font-size:10px;color:#888;border-bottom:1px solid #e5e5e5;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.b-green{background:#E1F5EE;color:#085041}
+.b-blue{background:#E6F1FB;color:#0C447C}
+.b-amber{background:#FAEEDA;color:#633806}
+.b-gray{background:#f0f0f0;color:#666}
+.b-red{background:#FCEBEB;color:#791F1F}
+.b-teal{background:#EAF3DE;color:#27500A}
+.b-purple{background:#EEEDFE;color:#3C3489}
+
+.doc-upload-box{border:1px dashed #ddd;border-radius:8px;padding:12px;background:#fafafa;text-align:center}
+.doc-upload-box.tiene-doc{border-color:#1D9E75;background:#f0faf6}
+.doc-label{font-size:11px;font-weight:700;color:#888;margin-bottom:8px;text-transform:uppercase}
+.doc-preview{margin-bottom:8px;min-height:40px;display:flex;align-items:center;justify-content:center}
+.doc-preview img{max-width:100%;max-height:120px;border-radius:4px;object-fit:cover}
+.doc-preview a{font-size:11px;color:#1D9E75;text-decoration:none}
+
+.loading-placeholder{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.scr{display:none}
+.scr.active{display:block}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.form-group label{display:block;font-size:11px;color:#888;margin-bottom:4px;font-weight:600}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:7px 10px;border:1px solid #ddd;border-radius:6px;font-size:12px;color:#1a1a1a;background:#fff}
+.form-group textarea{height:60px;resize:vertical}
+.section-divider{font-size:11px;font-weight:700;color:#1D9E75;text-transform:uppercase;letter-spacing:.06em;padding:10px 0 6px;border-bottom:2px solid #E1F5EE;margin-bottom:10px}
+.cliente-row{background:#fff;border:1px solid #e5e5e5;border-radius:8px;margin-bottom:8px;overflow:hidden}
+.cliente-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer}
+.cliente-header:hover{background:#f8f8f8}
+.cliente-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-right:10px}
+.cliente-info{display:flex;align-items:center;flex:1}
+.cliente-nombre{font-size:13px;font-weight:600}
+.cliente-sub{font-size:11px;color:#888}
+.cliente-meta{display:flex;align-items:center;gap:10px}
+.cliente-body{display:none;padding:14px;border-top:1px solid #e5e5e5;background:#fafafa}
+.cliente-body.open{display:block}
+.contacto-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.contacto-box{background:#fff;border:1px solid #e5e5e5;border-radius:6px;padding:10px}
+.contacto-box h4{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.contacto-box .ci{font-size:12px;margin-bottom:4px}
+.pres-box{background:#fff;border:1px solid #e5e5e5;border-radius:6px;padding:10px;margin-bottom:10px}
+.pres-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pi-label{font-size:10px;color:#888}
+.pi-val{font-weight:700;font-size:13px}
+.cert-box{background:#EAF3DE;border:1px solid #C0DD97;border-radius:8px;padding:14px;margin-top:12px}
+.cert-totales{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.cert-totales div label{display:block;font-size:10px;color:#3B6D11}
+.cert-totales div span{font-size:15px;font-weight:700;color:#085041}
+.edit-cert{background:#fff;border-radius:6px;padding:10px;margin-bottom:10px}
+.action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:100;align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:10px;padding:20px;width:580px;max-height:85vh;overflow-y:auto;margin-bottom:40px}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:14px;color:#1D9E75}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;padding-top:10px;border-top:1px solid #e5e5e5}
+.toast{position:fixed;bottom:20px;right:20px;background:#1D9E75;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .3s;z-index:200;pointer-events:none}
+.toast.show{opacity:1}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.dot-r{background:#E24B4A}.dot-a{background:#EF9F27}.dot-v{background:#1D9E75}
+.loading{text-align:center;padding:40px;color:#aaa;font-size:14px}
+.empty{text-align:center;padding:30px;color:#aaa;font-size:13px}
+
+/* ── Análisis ─────────────────────────────────── */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.kpi-card{border-radius:8px;padding:12px 14px;color:#fff}
+.kpi-card label{display:block;font-size:10px;opacity:.85;margin-bottom:4px}
+.kpi-card .val{font-size:20px;font-weight:700}
+.kpi-card .sub{font-size:10px;opacity:.75;margin-top:2px}
+.chart-wrap{position:relative;width:100%}
+.tab-row{display:flex;gap:0;border-bottom:1px solid #e5e5e5;margin-bottom:14px}
+.tab-btn{padding:8px 16px;font-size:12px;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab-btn.active{color:#1D9E75;border-bottom-color:#1D9E75;font-weight:600}
+.analisis-legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:12px;color:#666}
+.analisis-legend span{display:flex;align-items:center;gap:5px}
+.leg-sq{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.anio-highlight{background:#E1F5EE!important}
+.sync-bar{display:flex;align-items:center;justify-content:space-between;background:#f0faf6;border:1px solid #9FE1CB;border-radius:6px;padding:8px 12px;margin-bottom:14px;font-size:12px}
+.sync-bar span{color:#085041}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="sidebar">
+  <div class="logo"><h1>Gunix SRL</h1><p>Gestión de obras</p></div>
+  <div class="nav-section">Principal</div>
+  <div class="nav-item active" onclick="nav('dashboard',this)">▦ Dashboard</div>
+  <div class="nav-item" onclick="nav('clientes',this)">⌂ Clientes</div>
+  <div class="nav-item" onclick="nav('remitos',this)">↑ Remitos</div>
+  <div class="nav-item" onclick="nav('jornales',this)">👤 Empleados / Jornales</div>
+  <div class="nav-item" id="nav-jornales" onclick="nav('jornales',this)">👷 Jornales</div>
+  <div class="nav-section">Facturación</div>
+  <div class="nav-item" onclick="nav('certificados',this)">✓ Certificados</div>
+  <div class="nav-item" onclick="nav('facturas',this)">$ Facturas</div>
+  <div class="nav-item" onclick="nav('cobranza',this)">◎ Cobranza</div>
+  <div class="nav-section">Registro</div>
+  <div class="nav-item" onclick="nav('documentacion',this)">📄 Documentación</div>
+  <div class="nav-section" id="nav-gerencia-section" style="display:none">Gerencia</div>
+  <div class="nav-item gerencia-only" id="nav-analisis" style="display:none" onclick="nav('analisis',this)">📊 Análisis</div>
+  <div style="margin-top:auto;padding:14px;border-top:1px solid #e5e5e5">
+    <div style="font-size:11px;color:#888" id="user-email">gerencia.gunix</div>
+    <div style="font-size:10px;color:#aaa" id="user-rol">Gerente</div>
+  </div>
+</div>
+
+<div class="main">
+<div class="topbar">
+  <h2 id="page-title">Dashboard</h2>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-sm" onclick="abrirModalCliente()">+ Cliente</button>
+    <button class="btn btn-green btn-sm" onclick="nav('certificados',document.querySelectorAll('.nav-item')[4])">+ Certificado</button>
+  </div>
+</div>
+<div class="content">
+
+<!-- DASHBOARD -->
+<div class="scr active" id="scr-dashboard">
+  <div class="cards-row" id="dash-metrics"><div class="loading">Cargando...</div></div>
+  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:14px">
+    <div class="card">
+      <div class="card-header"><h3>Últimos remitos</h3></div>
+      <table><thead><tr><th>N°</th><th>Fecha</th><th>Obra</th><th>m²</th><th>m³</th><th>Estado</th></tr></thead>
+      <tbody id="dash-remitos"><tr><td colspan="6" class="loading">Cargando...</td></tr></tbody></table>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Cobranza</h3></div>
+      <div id="dash-cobranza" class="loading">Cargando...</div>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENTES -->
+<div class="scr" id="scr-clientes">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <h3 style="font-size:14px;font-weight:600">Clientes y obras</h3>
+    <button class="btn btn-green btn-sm" onclick="abrirModalCliente()">+ Nuevo cliente</button>
+  </div>
+  <div id="lista-clientes"><div class="loading">Cargando...</div></div>
+</div>
+
+<!-- REMITOS -->
+<div class="scr" id="scr-remitos">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <h3 style="font-size:14px;font-weight:600">Remitos</h3>
+    <button class="btn btn-green btn-sm" onclick="abrirModalRemito()">+ Cargar remito</button>
+  </div>
+  <div class="card"><div style="overflow-x:auto">
+    <table><thead><tr><th>N°</th><th>Fecha</th><th>Empresa</th><th>Obra</th><th>m²</th><th>m³</th><th>Terminación</th><th>Cuadrilla</th><th>Firmado</th><th>Estado</th></tr></thead>
+    <tbody id="tabla-remitos"><tr><td colspan="10" class="loading">Cargando...</td></tr></tbody></table>
+  </div></div>
+</div>
+
+<!-- CERTIFICADOS -->
+<div class="scr" id="scr-certificados">
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-header"><h3>Generar certificado</h3></div>
+    <div class="form-grid">
+      <div class="form-group"><label>Cliente / Obra</label>
+        <select id="cert-cliente" onchange="cargarRemitosParaCert()"><option value="">-- Seleccionar --</option></select>
+      </div>
+      <div class="form-group"><label>Índice CAC actual</label>
+        <input type="text" id="cert-cac" value="mar-26 · 19.771,2">
+      </div>
+    </div>
+    <div id="cert-remitos-lista" style="display:none">
+      <div style="font-size:11px;font-weight:600;color:#888;margin-bottom:6px">Seleccioná los remitos a incluir:</div>
+      <div id="cert-checkboxes" style="margin-bottom:10px"></div>
+      <button class="btn btn-green btn-sm" onclick="generarCertificado()">Calcular certificado</button>
+    </div>
+    <div id="cert-resultado"></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>Certificados generados</h3></div>
+    <table><thead><tr><th>N°</th><th>Fecha</th><th>Empresa</th><th>Obra</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+    <tbody id="tabla-certificados"><tr><td colspan="7" class="loading">Cargando...</td></tr></tbody></table>
+  </div>
+</div>
+
+<!-- FACTURAS -->
+<div class="scr" id="scr-facturas">
+  <div class="card"><div style="overflow-x:auto">
+    <div class="card-header"><h3>Facturas — listos para Colppy / Tango</h3></div>
+    <table><thead><tr><th>N°</th><th>Fecha</th><th>Empresa</th><th>CUIT</th><th>Neto</th><th>IVA</th><th>Total</th><th>Vence</th><th>Email cobr.</th><th>Estado</th><th></th></tr></thead>
+    <tbody id="tabla-facturas"><tr><td colspan="11" class="loading">Cargando...</td></tr></tbody></table>
+  </div></div>
+</div>
+
+<!-- COBRANZA -->
+<div class="scr" id="scr-cobranza">
+  <div class="cards-row" style="grid-template-columns:repeat(3,1fr)" id="cobr-metrics">
+    <div class="metric-card"><label>Por cobrar</label><div class="val" style="color:#854F0B">$0</div></div>
+    <div class="metric-card"><label>Vencidas</label><div class="val" style="color:#E24B4A">$0</div></div>
+    <div class="metric-card"><label>Cobrado este mes</label><div class="val" style="color:#1D9E75">$0</div></div>
+  </div>
+  <div class="card"><div style="overflow-x:auto">
+    <table><thead><tr><th>Factura</th><th>Empresa</th><th>Total</th><th>Vence</th><th>Email cobranza</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody id="tabla-cobranza"><tr><td colspan="7" class="loading">Cargando...</td></tr></tbody></table>
+  </div></div>
+</div>
+
+<!-- DOCUMENTACION -->
+<div class="scr" id="scr-documentacion">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <h3 style="font-size:14px;font-weight:600">Documentación enviada</h3>
+    <button class="btn btn-green btn-sm" onclick="abrirModalDoc()">+ Registrar envío</button>
+  </div>
+  <div class="card">
+    <table><thead><tr><th>Fecha</th><th>Empresa</th><th>Tipo</th><th>Descripción</th><th>Enviado por</th><th>Enviado</th><th>Fecha envío</th></tr></thead>
+    <tbody id="tabla-docs"><tr><td colspan="7" class="loading">Cargando...</td></tr></tbody></table>
+  </div>
+</div>
+
+<!-- ANÁLISIS GERENCIAL (solo gerencia.gunix) -->
+
+
+<div class="scr" id="scr-jornales">
+  <div class="topbar">
+    <h2>👷 Jornales</h2>
+    <div style="display:flex;gap:8px;align-items:center">
+      <select id="jornal-quincena" onchange="cargarJornales()" style="padding:5px 10px;border-radius:6px;border:1px solid #ddd;font-size:12px">
+        <option value="1-01">1ra quincena Enero</option><option value="2-01">2da quincena Enero</option>
+        <option value="1-02">1ra quincena Febrero</option><option value="2-02">2da quincena Febrero</option>
+        <option value="1-03">1ra quincena Marzo</option><option value="2-03">2da quincena Marzo</option>
+        <option value="1-04">1ra quincena Abril</option><option value="2-04">2da quincena Abril</option>
+        <option value="1-05" selected>1ra quincena Mayo</option><option value="2-05">2da quincena Mayo</option>
+        <option value="1-06">1ra quincena Junio</option><option value="2-06">2da quincena Junio</option>
+        <option value="1-07">1ra quincena Julio</option><option value="2-07">2da quincena Julio</option>
+        <option value="1-08">1ra quincena Agosto</option><option value="2-08">2da quincena Agosto</option>
+        <option value="1-09">1ra quincena Septiembre</option><option value="2-09">2da quincena Septiembre</option>
+        <option value="1-10">1ra quincena Octubre</option><option value="2-10">2da quincena Octubre</option>
+        <option value="1-11">1ra quincena Noviembre</option><option value="2-11">2da quincena Noviembre</option>
+        <option value="1-12">1ra quincena Diciembre</option><option value="2-12">2da quincena Diciembre</option>
+      </select>
+      <select id="jornal-anio" onchange="cargarJornales()" style="padding:5px 10px;border-radius:6px;border:1px solid #ddd;font-size:12px">
+        <option value="2026" selected>2026</option><option value="2025">2025</option>
+      </select>
+      <button class="btn btn-green btn-sm" onclick="sincronizarJotForm()">🔄 Sincronizar JotForm</button>
+    </div>
+  </div>
+  <div class="content">
+    <!-- KPIs -->
+    <div id="jornal-kpis" class="cards-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+      <div class="metric-card loading-placeholder" style="height:70px"></div>
+      <div class="metric-card loading-placeholder" style="height:70px"></div>
+      <div class="metric-card loading-placeholder" style="height:70px"></div>
+      <div class="metric-card loading-placeholder" style="height:70px"></div>
+    </div>
+
+    <!-- Tabs por cuadrilla -->
+    <div style="display:flex;gap:4px;margin-bottom:12px">
+      <button class="btn btn-sm" id="tab-todas" onclick="filtrarCuadrilla('todas')" style="background:#1D9E75;color:#fff;border-color:#0F6E56">Todas</button>
+      <button class="btn btn-sm" id="tab-roja" onclick="filtrarCuadrilla('Roja')" style="background:#FCEBEB;color:#791F1F;border-color:#E24B4A">🔴 Roja</button>
+      <button class="btn btn-sm" id="tab-amarilla" onclick="filtrarCuadrilla('Amarilla')" style="background:#FAEEDA;color:#633806;border-color:#EF9F27">🟡 Amarilla</button>
+      <button class="btn btn-sm" id="tab-verde" onclick="filtrarCuadrilla('Verde')" style="background:#E1F5EE;color:#085041;border-color:#1D9E75">🟢 Verde</button>
+    </div>
+
+    <!-- Tabla de liquidación -->
+    <div class="card">
+      <div class="card-header">
+        <h3 id="jornal-titulo">Liquidación — Mayo 2026</h3>
+        <span id="jornal-total" style="font-size:13px;font-weight:700;color:#1D9E75"></span>
+      </div>
+      <table id="tabla-jornales">
+        <thead>
+          <tr>
+            <th>Empleado</th>
+            <th>Cuadrilla</th>
+            <th>Rol</th>
+            <th style="text-align:center">Servicios</th>
+            <th style="text-align:center">Días</th>
+            <th style="text-align:center">Jornales</th>
+            <th style="text-align:right">Jornal base</th>
+            <th style="text-align:right">Total jornal</th>
+            <th style="text-align:right">Comida</th>
+            <th style="text-align:right;color:#1D9E75">TOTAL</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-jornales">
+          <tr><td colspan="11" class="empty">Cargando...</td></tr>
+        </tbody>
+        <tfoot id="tfoot-jornales"></tfoot>
+      </table>
+    </div>
+
+    <!-- Detalle del empleado -->
+    <div class="card" id="card-detalle-jornal" style="display:none">
+      <div class="card-header">
+        <h3 id="detalle-jornal-nombre">Detalle</h3>
+        <button class="btn btn-sm" onclick="document.getElementById('card-detalle-jornal').style.display='none'">✕ Cerrar</button>
+      </div>
+      <table>
+        <thead><tr><th>Fecha</th><th>Empresa/Obra</th><th>m²</th><th>m³</th><th>m² equiv.</th><th>Jornales</th><th>Cuadrilla</th></tr></thead>
+        <tbody id="tbody-detalle-jornal"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="scr" id="scr-analisis">
+  <div class="sync-bar">
+    <span id="sync-fecha">📅 Última actualización: cargando...</span>
+    <button class="btn btn-sm btn-green" onclick="sincronizarAhora()">↻ Actualizar ahora</button>
+  </div>
+
+  <div class="kpi-row" id="analisis-kpis">
+    <div class="loading" style="grid-column:1/-1">Cargando análisis...</div>
+  </div>
+
+  <div class="tab-row">
+    <div class="tab-btn active" onclick="setAnalisisTab('anual',this)">Resumen anual</div>
+    <div class="tab-btn" onclick="setAnalisisTab('mensual',this)">Mes a mes</div>
+    <div class="tab-btn" onclick="setAnalisisTab('cuadrillas',this)">Por cuadrilla</div>
+  </div>
+
+  <div class="analisis-legend">
+    <span><span class="leg-sq" style="background:#E24B4A"></span>Cuadrilla Roja</span>
+    <span><span class="leg-sq" style="background:#EF9F27"></span>Cuadrilla Amarilla</span>
+    <span><span class="leg-sq" style="background:#1D9E75"></span>Cuadrilla Verde</span>
+    <span><span class="leg-sq" style="background:#378ADD"></span>Tercerizado</span>
+    <span><span class="leg-sq" style="background:#7F77DD"></span>Cancelados</span>
+  </div>
+
+  <!-- Tab: Anual -->
+  <div id="tab-anual">
+    <div class="card">
+      <div class="card-header"><h3>Servicios realizados por año</h3></div>
+      <div class="chart-wrap" style="height:280px"><canvas id="chart-anual" role="img" aria-label="Servicios por año y cuadrilla"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Detalle anual</h3></div>
+      <table>
+        <thead><tr><th>Año</th><th>Cuad. Roja</th><th>Cuad. Amarilla</th><th>Cuad. Verde</th><th>Tercerizado</th><th>Total servicios</th><th>Cancelados</th><th>Var. anual</th></tr></thead>
+        <tbody id="tabla-anual"><tr><td colspan="8" class="loading">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab: Mensual -->
+  <div id="tab-mensual" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <h3>Servicios por mes</h3>
+        <select id="filtro-anio" onchange="renderMensual()" style="font-size:12px;padding:4px 8px;border:1px solid #ddd;border-radius:6px">
+          <option value="all">Todos los años</option>
+        </select>
+      </div>
+      <div class="chart-wrap" style="height:280px"><canvas id="chart-mensual" role="img" aria-label="Servicios mensuales"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Tabla mensual</h3></div>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Año</th><th>Mes</th><th>Cuad. Roja</th><th>Cuad. Amarilla</th><th>Cuad. Verde</th><th>Terc.</th><th>Bomba Gunix</th><th>Chavezcom</th><th>Cancelados</th><th>Total</th></tr></thead>
+        <tbody id="tabla-mensual"><tr><td colspan="10" class="loading">Cargando...</td></tr></tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Cuadrillas -->
+  <div id="tab-cuadrillas" style="display:none">
+    <div class="card">
+      <div class="card-header"><h3>Evolución por cuadrilla</h3></div>
+      <div class="chart-wrap" style="height:280px"><canvas id="chart-cuadrillas" role="img" aria-label="Evolución cuadrillas"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Participación por cuadrilla</h3></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="chart-wrap" style="height:220px"><canvas id="chart-torta" role="img" aria-label="Participación cuadrillas"></canvas></div>
+        <table style="align-self:start">
+          <thead><tr><th>Cuadrilla</th><th>Total hist.</th><th>2025</th><th>2026*</th></tr></thead>
+          <tbody id="tabla-cuadrillas"><tr><td colspan="4" class="loading">Cargando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- content -->
+</div><!-- main -->
+</div><!-- app -->
+
+<!-- MODALES -->
+<div class="modal-overlay" id="modal-cliente">
+<div class="modal">
+  <h3>Nuevo cliente / obra</h3>
+  <div class="section-divider">Datos de la empresa</div>
+  <div class="form-grid">
+    <div class="form-group"><label>Empresa *</label><input type="text" id="cl-empresa" placeholder="Ej: Constructora MRF SRL"></div>
+    <div class="form-group"><label>CUIT *</label><input type="text" id="cl-cuit" placeholder="Ej: 30-71234567-8"></div>
+  </div>
+  <div class="form-grid">
+    <div class="form-group"><label>Nombre de la obra *</label><input type="text" id="cl-obra" placeholder="Ej: French 2611"></div>
+    <div class="form-group"><label>Dirección</label><input type="text" id="cl-dir" placeholder="Ej: French 2611, CABA"></div>
+  </div>
+  <div class="section-divider">Contacto de obra</div>
+  <div class="form-grid-3">
+    <div class="form-group"><label>Nombre</label><input type="text" id="cl-obra-nombre"></div>
+    <div class="form-group"><label>Email</label><input type="text" id="cl-obra-email"></div>
+    <div class="form-group"><label>Teléfono</label><input type="text" id="cl-obra-tel"></div>
+  </div>
+  <div class="section-divider">Contacto de cobranza</div>
+  <div class="form-grid-3">
+    <div class="form-group"><label>Nombre</label><input type="text" id="cl-cobr-nombre"></div>
+    <div class="form-group"><label>Email *</label><input type="text" id="cl-cobr-email"></div>
+    <div class="form-group"><label>Teléfono</label><input type="text" id="cl-cobr-tel"></div>
+  </div>
+  <div class="section-divider">Condiciones comerciales</div>
+  <div class="form-grid">
+    <div class="form-group"><label>Forma de pago</label>
+      <select id="cl-pago"><option>7 días fecha factura</option><option>15 días</option><option>30 días</option><option>Efectivo</option><option>Cheque</option></select>
+    </div>
+    <div class="form-group"><label>N° Presupuesto</label><input type="text" id="cl-pres"></div>
+  </div>
+  <div class="section-divider">Precios</div>
+  <div class="form-grid-3">
+    <div class="form-group"><label>CAC base</label><input type="text" id="cl-cac" placeholder="Ej: sept-25"></div>
+    <div class="form-group"><label>Mínimo turno ($)</label><input type="text" id="cl-min"></div>
+    <div class="form-group"><label>Dif. espesor ($/m³)</label><input type="text" id="cl-dif"></div>
+  </div>
+  <div class="form-grid-3">
+    <div class="form-group"><label>Precio F+F ($/m²)</label><input type="text" id="cl-fyf"></div>
+    <div class="form-group"><label>Precio Fratazado</label><input type="text" id="cl-frat"></div>
+    <div class="form-group"><label>Precio Regleado</label><input type="text" id="cl-reg"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-sm" onclick="cerrarModal('modal-cliente')">Cancelar</button>
+    <button class="btn btn-green btn-sm" onclick="guardarNuevoCliente()">Guardar</button>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-remito">
+<div class="modal">
+  <h3>Cargar remito</h3>
+  <div class="form-grid">
+    <div class="form-group"><label>N° Remito</label><input type="number" id="rem-num"></div>
+    <div class="form-group"><label>Fecha del trabajo</label><input type="date" id="rem-fecha"></div>
+  </div>
+  <div class="form-group" style="margin-bottom:12px"><label>Cliente / Obra</label>
+    <select id="rem-cliente"><option value="">-- Seleccionar --</option></select>
+  </div>
+  <div class="form-grid">
+    <div class="form-group"><label>m²</label><input type="number" step="0.01" id="rem-m2"></div>
+    <div class="form-group"><label>m³</label><input type="number" step="0.1" id="rem-m3"></div>
+  </div>
+  <div class="form-grid">
+    <div class="form-group"><label>Terminación</label>
+      <select id="rem-term"><option>Fratazado y fieltrado</option><option>Fratazado</option><option>Regleado</option><option>Llaneado</option><option>Bombeo</option><option>Submuracion</option></select>
+    </div>
+    <div class="form-group"><label>Cuadrilla</label>
+      <select id="rem-cua"><option>Rojo</option><option>Amarillo</option><option>Verde</option><option>Azul (tercerizado)</option></select>
+    </div>
+  </div>
+  <div class="form-grid">
+    <div class="form-group"><label>Hora llegada</label><input type="time" id="rem-llegada"></div>
+    <div class="form-group"><label>Hora salida</label><input type="time" id="rem-salida"></div>
+  </div>
+  <div class="form-grid">
+    <div class="form-group"><label>Jefe de obra</label><input type="text" id="rem-jefe"></div>
+    <div class="form-group"><label>Firmado</label>
+      <select id="rem-firma"><option value="Si">Si</option><option value="No">No firma</option><option value="Condicional">Condicional</option></select>
+    </div>
+  </div>
+  <div class="form-grid">
+    <div class="form-group"><label>Hormigonera</label><input type="text" id="rem-horm"></div>
+    <div class="form-group"><label>Mov. bomba adicional</label><input type="number" id="rem-mov" value="0"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-sm" onclick="cerrarModal('modal-remito')">Cancelar</button>
+    <button class="btn btn-green btn-sm" onclick="guardarNuevoRemito()">Guardar</button>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-doc">
+<div class="modal">
+  <h3>Registrar documentación</h3>
+  <div class="form-group" style="margin-bottom:12px"><label>Cliente / Obra</label>
+    <select id="doc-cliente"><option value="">-- Seleccionar --</option></select>
+  </div>
+  <div class="form-grid">
+    <div class="form-group"><label>Tipo</label>
+      <select id="doc-tipo"><option>Remito digital</option><option>Certificado</option><option>Factura</option><option>Presupuesto</option><option>Otro</option></select>
+    </div>
+    <div class="form-group"><label>Enviado por</label>
+      <select id="doc-quien"><option>Gabriela</option><option>Romina</option><option>Gerencia</option></select>
+    </div>
+  </div>
+  <div class="form-group" style="margin-bottom:12px">
+    <label>Descripción</label><textarea id="doc-desc"></textarea>
+  </div>
+  <div class="form-group" style="margin-bottom:12px">
+    <label>¿Fue enviado?</label>
+    <select id="doc-enviado"><option value="1">Si</option><option value="0">No aún</option></select>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-sm" onclick="cerrarModal('modal-doc')">Cancelar</button>
+    <button class="btn btn-green btn-sm" onclick="guardarDoc()">Registrar</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const ES_GERENTE = true; // Se muestra para gerencia.gunix
+let clientesData = [];
+let analisisData = null;
+let chartAnual, chartMensual, chartCuadrillas, chartTorta;
+
+// ── Mostrar sección gerencia ────────────────────────────────
+if (ES_GERENTE) {
+  document.getElementById('nav-gerencia-section').style.display = '';
+  document.getElementById('nav-analisis').style.display = '';
+}
+
+// ── Navegación ──────────────────────────────────────────────
+function nav(s, el) {
+  document.querySelectorAll('.scr').forEach(x=>x.classList.remove('active'));
+  document.getElementById('scr-'+s).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const t={dashboard:'Dashboard',clientes:'Clientes',remitos:'Remitos',certificados:'Certificados',facturas:'Facturas',cobranza:'Cobranza',documentacion:'Documentación',analisis:'Análisis Gerencial'};
+  document.getElementById('page-title').textContent=t[s]||s;
+  cargarSeccion(s);
+}
+
+function cargarSeccion(s) {
+  if(s==='dashboard') cargarDashboard();
+  else if(s==='clientes') cargarClientes();
+  else if(s==='remitos') cargarRemitos();
+  else if(s==='certificados') cargarCertificados();
+  else if(s==='jornales') cargarJornales();
+  else if(s==='facturas') cargarFacturas();
+  else if(s==='cobranza') cargarCobranza();
+  else if(s==='documentacion') cargarDocumentacion();
+  else if(s==='analisis') cargarAnalisis();
+}
+
+// ── Dashboard ───────────────────────────────────────────────
+function cargarDashboard() {
+  google.script.run
+    .withFailureHandler(function(e) { 
+      document.getElementById('dash-metrics').innerHTML='<div style="color:red;padding:10px">Error: '+e.message+'</div>';
+      console.error('Dashboard error:', e);
+    })
+    .withSuccessHandler(function(d) {
+    document.getElementById('dash-metrics').innerHTML=`
+      <div class="metric-card"><label>Clientes activos</label><div class="val">${d.totalClientes}</div></div>
+      <div class="metric-card"><label>Remitos del mes</label><div class="val" style="color:#1D9E75">${d.remitosDelMes}</div></div>
+      <div class="metric-card"><label>Sin certificar</label><div class="val" style="color:#854F0B">${d.sinCertificar}</div></div>
+      <div class="metric-card"><label>Facturado mes</label><div class="val" style="color:#1D9E75">$${Math.round(d.facturadoMes).toLocaleString('es-AR')}</div></div>
+    `;
+    const tb=document.getElementById('dash-remitos');
+    tb.innerHTML=(!d.ultimosRemitos||!d.ultimosRemitos.length)
+      ?'<tr><td colspan="6" class="empty">Sin remitos este mes</td></tr>'
+      :d.ultimosRemitos.map(r=>`<tr><td>#${r.NumRemito}</td><td>${ff(r.Fecha)}</td><td>${r.Empresa||r.Obra}</td><td>${r.M2}</td><td>${r.M3}</td><td><span class="badge ${r.EstadoCert==='Certificado'?'b-blue':'b-gray'}">${r.EstadoCert||'Pendiente'}</span></td></tr>`).join('');
+    document.getElementById('dash-cobranza').innerHTML=`
+      <div style="padding:8px;background:#FAEEDA;border-radius:6px;margin-bottom:8px;display:flex;justify-content:space-between"><span style="color:#633806;font-size:12px">Por cobrar</span><span style="font-weight:700;color:#633806">$${Math.round(d.pendienteCobro).toLocaleString('es-AR')}</span></div>
+      <div style="padding:8px;background:#FCEBEB;border-radius:6px;margin-bottom:8px;display:flex;justify-content:space-between"><span style="color:#791F1F;font-size:12px">Vencidas</span><span style="font-weight:700;color:#791F1F">$${Math.round(d.vencidas).toLocaleString('es-AR')}</span></div>
+      <div style="padding:8px;background:#E1F5EE;border-radius:6px;display:flex;justify-content:space-between"><span style="color:#085041;font-size:12px">Cobrado este mes</span><span style="font-weight:700;color:#085041">$${Math.round(d.cobradoMes).toLocaleString('es-AR')}</span></div>
+    `;
+  }).getDashboard();
+}
+
+// ── Análisis Gerencial ──────────────────────────────────────
+function cargarAnalisis() {
+  if (analisisData) { renderAnalisis(analisisData); return; }
+  document.getElementById('analisis-kpis').innerHTML='<div class="loading" style="grid-column:1/-1">Cargando datos del calendario... (puede tardar unos segundos)</div>';
+  google.script.run
+    .withSuccessHandler(function(d) {
+      if (!d || !d.ok) { toast('Error al cargar análisis'); return; }
+      analisisData = d;
+      renderAnalisis(d);
+    })
+    .withFailureHandler(function(e) { toast('Error: '+e.message); })
+    .getAnalisisCalendario();
+}
+
+function renderAnalisis(d) {
+  // KPIs
+  const k = d.kpis;
+  document.getElementById('sync-fecha').textContent = '📅 Última actualización: '+k.ultimaActualizacion;
+  document.getElementById('analisis-kpis').innerHTML=`
+    <div class="kpi-card" style="background:#1D9E75"><label>Servicios 2026 (hasta hoy)</label><div class="val">${k.servicios2026}</div><div class="sub">enero–mayo 2026</div></div>
+    <div class="kpi-card" style="background:${k.varYoY>=0?'#0F6E56':'#A32D2D'}"><label>vs mismo período 2025</label><div class="val">${k.varYoY>=0?'+':''}${k.varYoY}%</div><div class="sub">comparación interanual</div></div>
+    <div class="kpi-card" style="background:#EF9F27"><label>Mejor cuadrilla 2026</label><div class="val" style="font-size:14px">${k.mejorCuadrilla2026}</div><div class="sub">más servicios en el año</div></div>
+    <div class="kpi-card" style="background:#854F0B"><label>Cancelaciones 2026</label><div class="val">${k.cancelaciones2026}</div><div class="sub">eventos cancelados</div></div>
+    <div class="kpi-card" style="background:#534AB7"><label>Total histórico</label><div class="val">${k.granTotal.toLocaleString('es-AR')}</div><div class="sub">servicios 2020–2026</div></div>
+  `;
+
+  // Poblar selector de año
+  const sel = document.getElementById('filtro-anio');
+  sel.innerHTML = '<option value="all">Todos los años</option>';
+  d.porAnio.forEach(a => {
+    const o = document.createElement('option');
+    o.value = a.anio; o.textContent = a.anio + (a.anio==='2026'?' (parcial)':'');
+    sel.appendChild(o);
+  });
+
+  renderTablaAnual(d.porAnio);
+  renderChartAnual(d.porAnio);
+  renderMensual();
+  renderTablasMensual(d.porMes);
+  renderCuadrillas(d.porAnio);
+}
+
+function renderChartAnual(porAnio) {
+  const labels = porAnio.map(a => a.anio+(a.anio==='2026'?'*':''));
+  if (chartAnual) chartAnual.destroy();
+  chartAnual = new Chart(document.getElementById('chart-anual'), {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Rojo',   data:porAnio.map(a=>a.rojo),     backgroundColor:'#E24B4A',borderWidth:0,stack:'s'},
+        {label:'Amarillo',data:porAnio.map(a=>a.amarillo),backgroundColor:'#EF9F27',borderWidth:0,stack:'s'},
+        {label:'Verde',  data:porAnio.map(a=>a.verde),    backgroundColor:'#1D9E75',borderWidth:0,stack:'s'},
+        {label:'Terc.',  data:porAnio.map(a=>a.azul),     backgroundColor:'#378ADD',borderWidth:0,stack:'s'},
+        {label:'Cancelados',data:porAnio.map(a=>a.cancelados),backgroundColor:'#DDD',borderWidth:0,stack:'c'},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:11}}},
+        y:{stacked:true,ticks:{font:{size:10}}}
+      }
+    }
+  });
+}
+
+function renderTablaAnual(porAnio) {
+  let prev = null;
+  document.getElementById('tabla-anual').innerHTML = porAnio.map(a => {
+    const total = a.total;
+    const var_ = prev ? ((total-prev)/prev*100).toFixed(1) : '—';
+    const varStr = prev ? `${parseFloat(var_)>=0?'+':''}${var_}%` : '—';
+    const varColor = prev ? (parseFloat(var_)>=0?'#1D9E75':'#E24B4A') : '#888';
+    const cls = a.anio==='2026' ? ' class="anio-highlight"' : '';
+    const nota = a.anio==='2026' ? '*' : '';
+    prev = total;
+    return `<tr${cls}>
+      <td><strong>${a.anio}${nota}</strong></td>
+      <td><span class="dot dot-r"></span>${a.rojo}</td>
+      <td><span class="dot dot-a"></span>${a.amarillo}</td>
+      <td><span class="dot dot-v"></span>${a.verde}</td>
+      <td>${a.azul}</td>
+      <td><strong style="color:#1D9E75">${total}</strong></td>
+      <td><span class="badge b-gray">${a.cancelados}</span></td>
+      <td style="color:${varColor};font-weight:600">${varStr}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderMensual() {
+  if (!analisisData) return;
+  const anioFiltro = document.getElementById('filtro-anio').value;
+  let data = analisisData.porMes;
+  if (anioFiltro !== 'all') data = data.filter(m=>m.anio===anioFiltro);
+  const labels = data.map(m => anioFiltro==='all' ? `${m.mes} ${m.anio.slice(2)}` : m.mes);
+  if (chartMensual) chartMensual.destroy();
+  chartMensual = new Chart(document.getElementById('chart-mensual'), {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Rojo',   data:data.map(m=>m.rojo),     backgroundColor:'#E24B4A',borderWidth:0,stack:'s'},
+        {label:'Amarillo',data:data.map(m=>m.amarillo),backgroundColor:'#EF9F27',borderWidth:0,stack:'s'},
+        {label:'Verde',  data:data.map(m=>m.verde),    backgroundColor:'#1D9E75',borderWidth:0,stack:'s'},
+        {label:'Terc.',  data:data.map(m=>m.azul),     backgroundColor:'#378ADD',borderWidth:0,stack:'s'},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{autoSkip:anioFiltro==='all',maxRotation:45,font:{size:10}}},
+        y:{stacked:true,ticks:{font:{size:10}}}
+      }
+    }
+  });
+}
+
+function renderTablasMensual(porMes) {
+  document.getElementById('tabla-mensual').innerHTML = porMes.map(m => {
+    const cls = m.anio==='2026' ? ' class="anio-highlight"' : '';
+    return `<tr${cls}>
+      <td>${m.anio}</td><td>${m.mes}</td>
+      <td>${m.rojo}</td><td>${m.amarillo}</td><td>${m.verde}</td>
+      <td>${m.azul}</td><td>${m.bomba}</td><td>${m.chavez}</td>
+      <td>${m.cancelados}</td><td><strong style="color:#1D9E75">${m.total}</strong></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderCuadrillas(porAnio) {
+  const labels = porAnio.map(a=>a.anio+(a.anio==='2026'?'*':''));
+  if (chartCuadrillas) chartCuadrillas.destroy();
+  chartCuadrillas = new Chart(document.getElementById('chart-cuadrillas'),{
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'Rojo',   data:porAnio.map(a=>a.rojo),     borderColor:'#E24B4A',tension:0.35,pointRadius:4,borderWidth:2,fill:false,backgroundColor:'rgba(226,75,74,0.08)'},
+        {label:'Amarillo',data:porAnio.map(a=>a.amarillo),borderColor:'#EF9F27',tension:0.35,pointRadius:4,borderWidth:2,fill:false,backgroundColor:'rgba(239,159,39,0.08)'},
+        {label:'Verde',  data:porAnio.map(a=>a.verde),    borderColor:'#1D9E75',tension:0.35,pointRadius:4,borderWidth:2,fill:false,backgroundColor:'rgba(29,158,117,0.08)'},
+        {label:'Terc.',  data:porAnio.map(a=>a.azul),     borderColor:'#378ADD',tension:0.35,pointRadius:4,borderWidth:2,fill:false,borderDash:[5,4],backgroundColor:'rgba(55,138,221,0.08)'},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{ticks:{font:{size:10}}}}}
+  });
+
+  // Torta totales históricos
+  const totalR=porAnio.reduce((s,a)=>s+a.rojo,0);
+  const totalA=porAnio.reduce((s,a)=>s+a.amarillo,0);
+  const totalV=porAnio.reduce((s,a)=>s+a.verde,0);
+  const totalT=porAnio.reduce((s,a)=>s+a.azul,0);
+  if (chartTorta) chartTorta.destroy();
+  chartTorta = new Chart(document.getElementById('chart-torta'),{
+    type:'doughnut',
+    data:{
+      labels:['Rojo','Amarillo','Verde','Terc.'],
+      datasets:[{data:[totalR,totalA,totalV,totalT],backgroundColor:['#E24B4A','#EF9F27','#1D9E75','#378ADD'],borderWidth:2}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
+  });
+
+  const anio2025 = porAnio.find(a=>a.anio==='2025')||{};
+  const anio2026 = porAnio.find(a=>a.anio==='2026')||{};
+  const gran = totalR+totalA+totalV+totalT;
+  document.getElementById('tabla-cuadrillas').innerHTML=[
+    ['Roja','#E24B4A',totalR,anio2025.rojo,anio2026.rojo],
+    ['Amarilla','#EF9F27',totalA,anio2025.amarillo,anio2026.amarillo],
+    ['Verde','#1D9E75',totalV,anio2025.verde,anio2026.verde],
+    ['Tercerizado','#378ADD',totalT,anio2025.azul,anio2026.azul],
+  ].map(([n,c,tot,y25,y26])=>`<tr>
+    <td><span class="dot" style="background:${c}"></span>${n}</td>
+    <td><strong>${tot}</strong> <span style="color:#aaa;font-size:10px">(${gran?Math.round(tot/gran*100):0}%)</span></td>
+    <td>${y25||0}</td><td>${y26||0}*</td>
+  </tr>`).join('');
+}
+
+function setAnalisisTab(tab, el) {
+  ['anual','mensual','cuadrillas'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function sincronizarAhora() {
+  toast('Sincronizando con Google Calendar...');
+  analisisData = null;
+  google.script.run.withSuccessHandler(function(r){
+    toast('Sincronizado: '+r.mesesProcesados+' meses actualizados');
+    cargarAnalisis();
+  }).forzarSincronizacion();
+}
+
+// ── Clientes ────────────────────────────────────────────────
+function cargarClientes() {
+  google.script.run.withSuccessHandler(function(data) {
+    clientesData=data; actualizarSelects();
+    const cont=document.getElementById('lista-clientes');
+    if(!data||!data.length){cont.innerHTML='<div class="empty">Sin clientes. Hacé click en "+ Nuevo cliente"</div>';return;}
+    const cols=['#E6F1FB','#E1F5EE','#FAEEDA','#FCEBEB','#EAF3DE','#EEEDFE'];
+    const tcols=['#0C447C','#085041','#633806','#791F1F','#27500A','#3C3489'];
+    cont.innerHTML=data.map((c,i)=>{
+      const ini=(c.Empresa||'').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+      const ci=i%cols.length;
+      const obras=c.obras||[];
+      const totalObras=obras.length;
+      return `<div class="cliente-row">
+        <div class="cliente-header" onclick="toggleCliente('cb-${i}')">
+          <div class="cliente-info">
+            <div class="cliente-avatar" style="background:${cols[ci]};color:${tcols[ci]}">${ini}</div>
+            <div>
+              <div class="cliente-nombre">${c.Empresa}</div>
+              <div class="cliente-sub">CUIT: ${c.CUIT||'—'} · ${totalObras} obra${totalObras!==1?'s':''}</div>
+            </div>
+          </div>
+          <div class="cliente-meta">
+            <span style="font-size:11px;color:#aaa">${c.totalRemitos||0} remitos</span>
+            <span class="badge ${c.Estado==='Activo'?'b-green':'b-gray'}">${c.Estado||'Activo'}</span>
+            <button class="btn btn-sm" onclick="event.stopPropagation();abrirEditarEmpresa(${i})" style="font-size:10px;padding:3px 8px">✏️ Editar</button>
+            <span style="color:#aaa">▼</span>
+          </div>
+        </div>
+        <div class="cliente-body" id="cb-${i}">
+          <div style="background:#f8f8f8;border-radius:6px;padding:10px;margin-bottom:12px">
+            <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Datos de facturación</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px">
+              <div><span style="color:#888">CUIT: </span>${c.CUIT||'—'}</div>
+              <div><span style="color:#888">Cond. IVA: </span>${c.CondicionIVA||'—'}</div>
+              <div><span style="color:#888">Dir. Fiscal: </span>${c.DirFiscal||'—'}</div>
+              <div><span style="color:#888">Email: </span>${c.EmailEmpresa||'—'}</div>
+              <div><span style="color:#888">Tel: </span>${c.TelEmpresa||'—'}</div>
+              <div><span style="color:#888">Localidad: </span>${c.Localidad||'—'}</div>
+            </div>
+            <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e5e5;font-size:12px">
+              <strong style="font-size:10px;color:#888;text-transform:uppercase">Cobranza: </strong>
+              ${c.CobrNombre||'—'} · ${c.CobrEmail||'—'} · ${c.CobrTel||'—'}
+            </div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:#1D9E75;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;gap:10px">
+            <span>Obras (${totalObras})</span>
+            <button class="btn btn-sm btn-green" onclick="event.stopPropagation();abrirAgregarObra('${c.ID}','${c.Empresa.replace(/'/g,"\'")}',${i})" style="font-size:10px">+ Nueva obra</button>
+          </div>
+          ${totalObras===0?'<div class="empty" style="padding:10px;font-size:12px">Sin obras registradas</div>':''}
+          ${obras.map((o,oi)=>{
+            const tienePres=o.PrecioFyF&&parseFloat(o.PrecioFyF)>0;
+            return `<div style="border:1px solid #e5e5e5;border-radius:6px;padding:10px;margin-bottom:8px;background:#fff">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <div>
+                  <span style="font-weight:600;font-size:13px">${o.NombreObra||o.DireccionObra||'Sin nombre'}</span>
+                  ${o.DireccionObra?`<span style="color:#888;font-size:11px;margin-left:8px">${o.DireccionObra}</span>`:''}
+                </div>
+                <button class="btn btn-sm" onclick="abrirEditarObra(${i},${oi})" style="font-size:10px;padding:3px 8px">✏️ Editar obra</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;margin-bottom:8px">
+                <div>
+                  <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:4px">CONTACTO DE OBRA</div>
+                  <div>${o.ObraNombre||'—'}</div>
+                  <div style="color:#185FA5">${o.ObraEmail||'—'}</div>
+                  <div>${o.ObraTel||'—'}</div>
+                </div>
+                <div>
+                  <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:4px">PRESUPUESTO</div>
+                  ${tienePres?`
+                    <div>F+F: <strong>$${parseFloat(o.PrecioFyF).toLocaleString('es-AR')}/m²</strong></div>
+                    <div>Fratazado: <strong>$${parseFloat(o.PrecioFrat||0).toLocaleString('es-AR')}/m²</strong></div>
+                    <div>Mínimo: <strong>$${parseFloat(o.Minimo||0).toLocaleString('es-AR')}</strong> · CAC: ${o.CACBase||'—'}</div>
+                  `:'<div style="color:#854F0B;font-size:11px">Sin presupuesto</div>'}
+                </div>
+              </div>
+              <div class="action-row">
+                ${tienePres?`<button class="btn btn-green btn-sm" onclick="irACertificar('${c.ID}')">Certificado ↗</button>`:''}
+                <button class="btn btn-sm" onclick="abrirModalRemito('${c.ID}')">+ Remito</button>
+                <button class="btn btn-sm" onclick="abrirModalDoc('${c.ID}')">+ Doc.</button>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  }).getClientes();
+}
+
+function cargarRemitos() {
+  google.script.run.withSuccessHandler(function(data) {
+    const tb=document.getElementById('tabla-remitos');
+    if(!data||!data.length){tb.innerHTML='<tr><td colspan="10" class="empty">Sin remitos</td></tr>';return;}
+    tb.innerHTML=data.slice().reverse().map(r=>`<tr>
+      <td>#${r.NumRemito}</td><td>${ff(r.Fecha)}</td><td>${r.Empresa}</td>
+      <td style="font-size:11px;color:#888">${r.Obra}</td><td>${r.M2}</td><td>${r.M3}</td>
+      <td>${r.Terminacion}</td>
+      <td><span class="dot ${r.Cuadrilla==='Rojo'?'dot-r':r.Cuadrilla==='Amarillo'?'dot-a':'dot-v'}"></span>${r.Cuadrilla}</td>
+      <td><span class="badge ${r.Firmado==='Si'?'b-green':'b-red'}">${r.Firmado}</span></td>
+      <td><span class="badge ${r.EstadoCert==='Certificado'?'b-blue':'b-gray'}">${r.EstadoCert||'Pendiente'}</span></td>
+    </tr>`).join('');
+  }).getRemitos();
+}
+
+function cargarCertificados() {
+  if(!clientesData.length) google.script.run.withSuccessHandler(d=>{clientesData=d;actualizarSelects();}).getClientes();
+  google.script.run.withSuccessHandler(function(data) {
+    const tb=document.getElementById('tabla-certificados');
+    if(!data||!data.length){tb.innerHTML='<tr><td colspan="7" class="empty">Sin certificados</td></tr>';return;}
+    tb.innerHTML=data.slice().reverse().map(c=>`<tr>
+      <td>N°${c.NumCert}</td><td>${ff(c.Fecha)}</td><td>${c.Empresa}</td>
+      <td style="font-size:11px;color:#888">${c.Obra}</td>
+      <td style="font-weight:700;color:#1D9E75">$${Math.round(parseFloat(c.Total)||0).toLocaleString('es-AR')}</td>
+      <td><span class="badge ${c.Estado==='Aprobado'?'b-teal':c.Estado==='Generado'?'b-blue':'b-gray'}">${c.Estado}</span></td>
+      <td style="display:flex;gap:5px;padding:5px 8px">
+        ${c.Estado==='Generado'?`<button class="btn btn-sm btn-green" onclick="aprobarCert('${c.ID}')">Aprobar</button>`:''}
+        ${c.Estado==='Aprobado'?`<button class="btn btn-sm" onclick="generarFacturaDesdeCert('${c.ID}','${c.ClienteID}','${c.Empresa}',${c.Total})">Facturar</button>`:''}
+      </td>
+    </tr>`).join('');
+  }).getCertificados();
+}
+
+function cargarRemitosParaCert() {
+  const cid=document.getElementById('cert-cliente').value;
+  if(!cid){document.getElementById('cert-remitos-lista').style.display='none';return;}
+  const cliente=clientesData.find(c=>c.ID===cid);
+  if(!cliente)return;
+  const pendientes=(cliente.remitos||[]).filter(r=>!r.EstadoCert||r.EstadoCert==='Pendiente');
+  const cont=document.getElementById('cert-checkboxes');
+  cont.innerHTML=!pendientes.length
+    ?'<div class="empty" style="padding:10px">Sin remitos pendientes</div>'
+    :pendientes.map(r=>`<label style="display:flex;align-items:center;gap:8px;padding:7px;border:1px solid #e5e5e5;border-radius:6px;margin-bottom:5px;cursor:pointer;font-size:12px"><input type="checkbox" value="${r.ID}" checked> #${r.NumRemito} · ${ff(r.Fecha)} · ${r.M2} m² · ${r.M3} m³ · ${r.Terminacion}</label>`).join('');
+  document.getElementById('cert-remitos-lista').style.display='block';
+  document.getElementById('cert-resultado').innerHTML='';
+}
+
+function generarCertificado() {
+  const cid=document.getElementById('cert-cliente').value;
+  const ids=Array.from(document.querySelectorAll('#cert-checkboxes input:checked')).map(c=>c.value);
+  if(!cid||!ids.length){toast('Seleccioná al menos un remito');return;}
+  google.script.run.withSuccessHandler(function(d) {
+    if(!d.ok){toast('Error: '+d.error);return;}
+    const cac=document.getElementById('cert-cac').value;
+    document.getElementById('cert-resultado').innerHTML=`
+      <div class="cert-box">
+        <h4>Certificado calculado — ${d.cliente.Empresa}</h4>
+        <table style="margin-bottom:10px">
+          <thead><tr><th>N° Remito</th><th>Fecha</th><th>m²</th><th>m³</th><th>Terminación</th><th>Precio/m²</th><th>Subtotal</th></tr></thead>
+          <tbody>${d.remitos.map(r=>`<tr><td>#${r.NumRemito}</td><td>${ff(r.Fecha)}</td><td>${r.M2}</td><td>${r.M3}</td><td>${r.Terminacion}</td><td>$${(r.precio||0).toLocaleString('es-AR')}</td><td>$${Math.round(r.sub||0).toLocaleString('es-AR')}</td></tr>`).join('')}</tbody>
+        </table>
+        <div class="cert-totales">
+          <div><label>Total m²</label><span>${(d.m2Total||0).toFixed(2)}</span></div>
+          <div><label>Total m³</label><span>${d.m3Total||0}</span></div>
+          <div><label>Subtotal</label><span>$${(d.subtotal||0).toLocaleString('es-AR')}</span></div>
+          <div><label>Ajuste CAC</label><span>$${(d.ajusteCAC||0).toLocaleString('es-AR')}</span></div>
+          <div><label>Neto</label><span>$${(d.neto||0).toLocaleString('es-AR')}</span></div>
+          <div><label>Total c/IVA</label><span style="font-size:18px">$${(d.total||0).toLocaleString('es-AR')}</span></div>
+        </div>
+        <div class="edit-cert">
+          <div class="form-grid-3">
+            <div class="form-group"><label>Extensión horaria (hs)</label><input type="number" id="ext-hs" value="0" min="0" step="0.25"></div>
+            <div class="form-group"><label>Dif. espesor adicional m³</label><input type="number" id="dif-m3" value="0"></div>
+            <div class="form-group"><label>Observaciones</label><input type="text" id="obs-cert" placeholder="Opcional"></div>
+          </div>
+        </div>
+        <div class="action-row">
+          <button class="btn btn-green btn-sm" onclick="confirmarGuardarCert('${cid}','${d.cliente.Empresa}','${d.cliente.Obra}',${d.subtotal},${d.ajusteCAC},${d.total},${d.neto},${d.iva},'${ids.join(',')}','${cac}',${d.m2Total},${d.m3Total})">Guardar certificado</button>
+          <button class="btn btn-sm" onclick="document.getElementById('cert-resultado').innerHTML=''">Cancelar</button>
+        </div>
+      </div>`;
+  }).calcularCertificado(cid,ids);
+}
+
+function confirmarGuardarCert(cid,emp,obra,sub,cajuste,total,neto,iva,remStr,cac,m2,m3) {
+  google.script.run.withSuccessHandler(r=>{
+    if(r.ok){toast('Certificado N°'+r.numCert+' guardado ✓');document.getElementById('cert-resultado').innerHTML='';document.getElementById('cert-cliente').value='';document.getElementById('cert-remitos-lista').style.display='none';clientesData=[];cargarCertificados();}
+  }).guardarCertificado({
+    clienteID:cid,empresa:emp,obra,subtotal:sub,ajusteCAC:cajuste,total,neto,iva,
+    m2Total:m2,m3Total:m3,
+    extHoraria:parseFloat(document.getElementById('ext-hs').value)||0,
+    difEspesorAd:parseFloat(document.getElementById('dif-m3').value)||0,
+    remitosIncluidos:remStr,remitosIDs:remStr.split(','),
+    cacActual:cac,observaciones:document.getElementById('obs-cert').value||''
+  });
+}
+
+function aprobarCert(id) {
+  google.script.run.withSuccessHandler(r=>{if(r.ok){toast('Aprobado ✓');cargarCertificados();}}).aprobarCertificado(id);
+}
+
+function generarFacturaDesdeCert(certID,cid,emp,total) {
+  const t=Math.round(total),neto=Math.round(t/1.21),iva=t-neto;
+  google.script.run.withSuccessHandler(r=>{if(r.ok){toast('Factura '+r.numFactura+' generada');nav('facturas',document.querySelectorAll('.nav-item')[5]);}}).guardarFactura({certID,clienteID:cid,empresa:emp,neto,iva,total:t});
+}
+
+function cargarFacturas() {
+  google.script.run.withSuccessHandler(function(data) {
+    const tb=document.getElementById('tabla-facturas');
+    if(!data||!data.length){tb.innerHTML='<tr><td colspan="11" class="empty">Sin facturas</td></tr>';return;}
+    tb.innerHTML=data.slice().reverse().map(f=>`<tr>
+      <td style="font-weight:700">${f.NumFactura}</td><td>${ff(f.Fecha)}</td><td>${f.Empresa}</td>
+      <td style="font-size:11px">${f.CUIT||'—'}</td>
+      <td>$${Math.round(parseFloat(f.Neto)||0).toLocaleString('es-AR')}</td>
+      <td>$${Math.round(parseFloat(f.IVA)||0).toLocaleString('es-AR')}</td>
+      <td style="font-weight:700;color:#1D9E75">$${Math.round(parseFloat(f.Total)||0).toLocaleString('es-AR')}</td>
+      <td>${ff(f.FechaVencimiento)}</td>
+      <td style="font-size:11px;color:#185FA5">${f.EmailCobranza||'—'}</td>
+      <td><span class="badge ${f.Estado==='Cobrada'?'b-teal':f.Estado==='Emitida'?'b-blue':'b-amber'}">${f.Estado}</span></td>
+      <td><button class="btn btn-sm" onclick="toast('Datos copiados para Colppy')">Exportar</button></td>
+    </tr>`).join('');
+  }).getFacturas();
+}
+
+function cargarCobranza() {
+  google.script.run.withSuccessHandler(function(data) {
+    const hoy=new Date();
+    const pend=(data||[]).filter(f=>f.Estado!=='Cobrada');
+    const porCobrar=pend.reduce((s,f)=>s+(parseFloat(f.Total)||0),0);
+    const venc=pend.reduce((s,f)=>{ const v=new Date(f.FechaVencimiento); return v<hoy?s+(parseFloat(f.Total)||0):s; },0);
+    const cobs=document.getElementById('cobr-metrics').querySelectorAll('.val');
+    if(cobs[0])cobs[0].textContent='$'+Math.round(porCobrar).toLocaleString('es-AR');
+    if(cobs[1])cobs[1].textContent='$'+Math.round(venc).toLocaleString('es-AR');
+    const tb=document.getElementById('tabla-cobranza');
+    if(!pend.length){tb.innerHTML='<tr><td colspan="7" class="empty">Sin facturas pendientes</td></tr>';return;}
+    tb.innerHTML=pend.map(f=>{
+      const v=new Date(f.FechaVencimiento),vencida=v<hoy;
+      return `<tr>
+        <td style="font-weight:700">${f.NumFactura}</td><td>${f.Empresa}</td>
+        <td style="font-weight:700">$${Math.round(parseFloat(f.Total)||0).toLocaleString('es-AR')}</td>
+        <td style="color:${vencida?'#E24B4A':'inherit'};font-weight:${vencida?700:400}">${vencida?'VENCIDA':ff(f.FechaVencimiento)}</td>
+        <td style="font-size:11px;color:#185FA5">${f.EmailCobranza||'—'}</td>
+        <td><span class="badge ${vencida?'b-red':'b-amber'}">${vencida?'Vencida':f.Estado}</span></td>
+        <td style="display:flex;gap:5px;padding:5px 8px">
+          <button class="btn btn-sm" onclick="toast('Recordatorio enviado')">Recordar</button>
+          <button class="btn btn-green btn-sm" onclick="cobrar('${f.ID}')">Cobrado</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }).getFacturas();
+}
+
+function cobrar(id){ google.script.run.withSuccessHandler(r=>{if(r.ok){toast('Cobrado ✓');cargarCobranza();}}).marcarCobrada(id); }
+
+function cargarDocumentacion() {
+  if(!clientesData.length) google.script.run.withSuccessHandler(d=>{clientesData=d;actualizarSelects();}).getClientes();
+  google.script.run.withSuccessHandler(function(data) {
+    const tb=document.getElementById('tabla-docs');
+    if(!data||!data.length){tb.innerHTML='<tr><td colspan="7" class="empty">Sin documentación</td></tr>';return;}
+    tb.innerHTML=data.slice().reverse().map(d=>`<tr>
+      <td>${ff(d.Fecha)}</td><td>${d.Empresa}</td>
+      <td><span class="badge b-blue">${d.TipoDoc}</span></td>
+      <td>${d.Descripcion}</td><td>${d.EnviadoPor}</td>
+      <td><span class="badge ${d.Enviado==='Si'?'b-green':'b-red'}">${d.Enviado}</span></td>
+      <td>${d.Enviado==='Si'?ff(d.FechaEnvio):'—'}</td>
+    </tr>`).join('');
+  }).getDocumentacion();
+}
+
+// ── Helpers ─────────────────────────────────────────────────
+function actualizarSelects() {
+  ['cert-cliente','rem-cliente','doc-cliente'].forEach(id=>{
+    const sel=document.getElementById(id); if(!sel)return;
+    const v=sel.value;
+    sel.innerHTML='<option value="">-- Seleccionar --</option>';
+    clientesData.forEach(c=>{ const o=document.createElement('option'); o.value=c.ID; o.textContent=c.Empresa+' — '+c.Obra; sel.appendChild(o); });
+    if(v)sel.value=v;
+  });
+}
+
+function abrirModalCliente() {
+  ['cl-empresa','cl-cuit','cl-obra','cl-dir','cl-obra-nombre','cl-obra-email','cl-obra-tel','cl-cobr-nombre','cl-cobr-email','cl-cobr-tel','cl-pres','cl-cac','cl-min','cl-dif','cl-fyf','cl-frat','cl-reg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('modal-cliente').classList.add('open');
+}
+function abrirModalRemito(cid) {
+  if(!clientesData.length) google.script.run.withSuccessHandler(d=>{clientesData=d;actualizarSelects();}).getClientes();
+  document.getElementById('modal-remito').classList.add('open');
+  document.getElementById('rem-fecha').value=new Date().toISOString().split('T')[0];
+  if(cid)setTimeout(()=>{document.getElementById('rem-cliente').value=cid;},300);
+}
+function abrirModalDoc(cid) {
+  if(!clientesData.length) google.script.run.withSuccessHandler(d=>{clientesData=d;actualizarSelects();}).getClientes();
+  document.getElementById('modal-doc').classList.add('open');
+  if(cid)setTimeout(()=>{document.getElementById('doc-cliente').value=cid;},300);
+}
+function cerrarModal(id){document.getElementById(id).classList.remove('open');}
+
+function guardarNuevoCliente() {
+  const emp=document.getElementById('cl-empresa').value,cuit=document.getElementById('cl-cuit').value;
+  if(!emp||!cuit){toast('Completá empresa y CUIT');return;}
+  google.script.run.withSuccessHandler(r=>{if(r.ok){toast('Cliente guardado ✓');cerrarModal('modal-cliente');clientesData=[];cargarClientes();}}).guardarCliente({
+    empresa:emp,cuit,
+    obra:document.getElementById('cl-obra').value,
+    direccion:document.getElementById('cl-dir').value,
+    obraNombre:document.getElementById('cl-obra-nombre').value,
+    obraEmail:document.getElementById('cl-obra-email').value,
+    obraTel:document.getElementById('cl-obra-tel').value,
+    cobrNombre:document.getElementById('cl-cobr-nombre').value,
+    cobrEmail:document.getElementById('cl-cobr-email').value,
+    cobrTel:document.getElementById('cl-cobr-tel').value,
+    formaPago:document.getElementById('cl-pago').value,
+    presupuesto:document.getElementById('cl-pres').value,
+    cacBase:document.getElementById('cl-cac').value,
+    minimo:document.getElementById('cl-min').value,
+    difEspesor:document.getElementById('cl-dif').value,
+    precioFyF:document.getElementById('cl-fyf').value,
+    precioFrat:document.getElementById('cl-frat').value,
+    precioReg:document.getElementById('cl-reg').value
+  });
+}
+
+function guardarNuevoRemito() {
+  const cid=document.getElementById('rem-cliente').value,num=document.getElementById('rem-num').value;
+  if(!cid||!num){toast('Seleccioná cliente y número de remito');return;}
+  const cli=clientesData.find(c=>c.ID===cid)||{};
+  google.script.run.withSuccessHandler(r=>{if(r.ok){toast('Remito #'+num+' guardado ✓');cerrarModal('modal-remito');clientesData=[];cargarRemitos();}}).guardarRemito({
+    numRemito:num,fecha:document.getElementById('rem-fecha').value,
+    clienteID:cid,empresa:cli.Empresa||'',obra:cli.Obra||'',
+    m2:document.getElementById('rem-m2').value,m3:document.getElementById('rem-m3').value,
+    terminacion:document.getElementById('rem-term').value,cuadrilla:document.getElementById('rem-cua').value,
+    firmado:document.getElementById('rem-firma').value,
+    horaLlegada:document.getElementById('rem-llegada').value,horaSalida:document.getElementById('rem-salida').value,
+    jefeObra:document.getElementById('rem-jefe').value,hormigonera:document.getElementById('rem-horm').value,
+    movBomba:document.getElementById('rem-mov').value
+  });
+}
+
+function guardarDoc() {
+  const cid=document.getElementById('doc-cliente').value;
+  if(!cid){toast('Seleccioná el cliente');return;}
+  const cli=clientesData.find(c=>c.ID===cid)||{};
+  google.script.run.withSuccessHandler(r=>{if(r.ok){toast('Registrado ✓');cerrarModal('modal-doc');cargarDocumentacion();}}).guardarDocumentacion({
+    clienteID:cid,empresa:cli.Empresa||'',
+    tipoDoc:document.getElementById('doc-tipo').value,
+    descripcion:document.getElementById('doc-desc').value,
+    enviadoPor:document.getElementById('doc-quien').value,
+    enviado:document.getElementById('doc-enviado').value==='1',
+    observaciones:''
+  });
+}
+
+function irACertificar(cid) {
+  nav('certificados',document.querySelectorAll('.nav-item')[4]);
+  setTimeout(()=>{document.getElementById('cert-cliente').value=cid;cargarRemitosParaCert();},400);
+}
+
+function toggleCliente(id){document.getElementById(id).classList.toggle('open');}
+
+function ff(f) {
+  if(!f)return'—';
+  try{return new Date(f).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});}
+  catch(e){return f;}
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+});
+
+
+function abrirEditarEmpresa(idx) {
+  const c = clientesData[idx];
+  if (!c) return;
+  document.getElementById('ee-id').value = c.ID||'';
+  document.getElementById('ee-razon').value = c.Empresa||'';
+  document.getElementById('ee-cuit').value = c.CUIT||'';
+  document.getElementById('ee-condiva').value = c.CondicionIVA||'';
+  document.getElementById('ee-dir').value = c.DirFiscal||'';
+  document.getElementById('ee-loc').value = c.Localidad||'';
+  document.getElementById('ee-tel').value = c.TelEmpresa||'';
+  document.getElementById('ee-email').value = c.EmailEmpresa||'';
+  document.getElementById('ee-cobrnombre').value = c.CobrNombre||'';
+  document.getElementById('ee-cobremail').value = c.CobrEmail||'';
+  document.getElementById('ee-cobrtel').value = c.CobrTel||'';
+  document.getElementById('modal-editar-empresa').classList.add('open');
+}
+
+function guardarEditarEmpresa() {
+  const d = {
+    ID: document.getElementById('ee-id').value,
+    RazonSocial: document.getElementById('ee-razon').value,
+    CUIT: document.getElementById('ee-cuit').value,
+    CondicionIVA: document.getElementById('ee-condiva').value,
+    DirFiscal: document.getElementById('ee-dir').value,
+    Localidad: document.getElementById('ee-loc').value,
+    TelEmpresa: document.getElementById('ee-tel').value,
+    EmailEmpresa: document.getElementById('ee-email').value,
+    CobrNombre: document.getElementById('ee-cobrnombre').value,
+    CobrEmail: document.getElementById('ee-cobremail').value,
+    CobrTel: document.getElementById('ee-cobrtel').value,
+  };
+  google.script.run.withSuccessHandler(r=>{
+    if(r.ok){toast('Empresa actualizada ✓');cerrarModal('modal-editar-empresa');clientesData=[];cargarClientes();}
+    else toast('Error: '+(r.error||'desconocido'));
+  }).editarEmpresa(d);
+}
+
+function abrirEditarObra(idx, oidx) {
+  const c = clientesData[idx];
+  const o = c.obras[oidx];
+  if (!o) return;
+  document.getElementById('eo-id').value = o.ID||'';
+  document.getElementById('eo-nombre').value = o.NombreObra||'';
+  document.getElementById('eo-dir').value = o.DireccionObra||'';
+  document.getElementById('eo-loc').value = o.LocalidadObra||'';
+  document.getElementById('eo-obranombre').value = o.ObraNombre||'';
+  document.getElementById('eo-obraemail').value = o.ObraEmail||'';
+  document.getElementById('eo-obratel').value = o.ObraTel||'';
+  document.getElementById('eo-pres').value = o.Presupuesto||'';
+  document.getElementById('eo-fyf').value = o.PrecioFyF||'';
+  document.getElementById('eo-frat').value = o.PrecioFrat||'';
+  document.getElementById('eo-reg').value = o.PrecioReg||'';
+  document.getElementById('eo-dif').value = o.DifEspesor||'';
+  document.getElementById('eo-min').value = o.Minimo||'';
+  document.getElementById('eo-cac').value = o.CACBase||'';
+  document.getElementById('modal-editar-obra').classList.add('open');
+}
+
+function guardarEditarObra() {
+  const d = {
+    ID: document.getElementById('eo-id').value,
+    NombreObra: document.getElementById('eo-nombre').value,
+    DireccionObra: document.getElementById('eo-dir').value,
+    LocalidadObra: document.getElementById('eo-loc').value,
+    ObraNombre: document.getElementById('eo-obranombre').value,
+    ObraEmail: document.getElementById('eo-obraemail').value,
+    ObraTel: document.getElementById('eo-obratel').value,
+    Presupuesto: document.getElementById('eo-pres').value,
+    PrecioFyF: document.getElementById('eo-fyf').value,
+    PrecioFrat: document.getElementById('eo-frat').value,
+    PrecioReg: document.getElementById('eo-reg').value,
+    DifEspesor: document.getElementById('eo-dif').value,
+    Minimo: document.getElementById('eo-min').value,
+    CACBase: document.getElementById('eo-cac').value,
+  };
+  google.script.run.withSuccessHandler(r=>{
+    if(r.ok){toast('Obra actualizada ✓');cerrarModal('modal-editar-obra');clientesData=[];cargarClientes();}
+    else toast('Error: '+(r.error||'desconocido'));
+  }).editarObra(d);
+}
+
+function abrirAgregarObra(empId, empNombre, idx) {
+  document.getElementById('ao-empid').value = empId;
+  document.getElementById('ao-empnombre').value = empNombre;
+  ['ao-nombre','ao-dir','ao-loc','ao-obranombre','ao-obraemail','ao-obratel','ao-pres','ao-fyf','ao-frat','ao-reg','ao-dif','ao-min','ao-cac'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('modal-agregar-obra').classList.add('open');
+}
+
+function guardarAgregarObra() {
+  const d = {
+    EmpresaID: document.getElementById('ao-empid').value,
+    RazonSocial: document.getElementById('ao-empnombre').value,
+    NombreObra: document.getElementById('ao-nombre').value,
+    DireccionObra: document.getElementById('ao-dir').value,
+    LocalidadObra: document.getElementById('ao-loc').value,
+    ObraNombre: document.getElementById('ao-obranombre').value,
+    ObraEmail: document.getElementById('ao-obraemail').value,
+    ObraTel: document.getElementById('ao-obratel').value,
+    Presupuesto: document.getElementById('ao-pres').value,
+    PrecioFyF: document.getElementById('ao-fyf').value,
+    PrecioFrat: document.getElementById('ao-frat').value,
+    PrecioReg: document.getElementById('ao-reg').value,
+    DifEspesor: document.getElementById('ao-dif').value,
+    Minimo: document.getElementById('ao-min').value,
+    CACBase: document.getElementById('ao-cac').value,
+  };
+  if (!d.NombreObra) { toast('Ingresá el nombre de la obra'); return; }
+  google.script.run.withSuccessHandler(r=>{
+    if(r.ok){toast('Obra agregada ✓');cerrarModal('modal-agregar-obra');clientesData=[];cargarClientes();}
+    else toast('Error: '+(r.error||'desconocido'));
+  }).agregarObra(d);
+}
+
+
+// ── Jornales ──────────────────────────────────────────────
+let jornalesData = null;
+let cuadrillaFiltro = 'todas';
+
+function cargarJornales() {
+  const quincena = document.getElementById('jornal-quincena').value;
+  const anio = document.getElementById('jornal-anio').value;
+  const [q, mes] = quincena.split('-');
+  const MESES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const qLabel = (q==='1'?'1ra':'2da') + ' quincena ' + MESES[parseInt(mes)] + ' ' + anio;
+  document.getElementById('jornal-titulo').textContent = 'Liquidación — ' + qLabel;
+  document.getElementById('tbody-jornales').innerHTML = '<tr><td colspan="11" class="empty">Cargando...</td></tr>';
+  
+  // Calcular fechas de la quincena
+  const desde = anio + '-' + mes + '-01';
+  const hasta = q==='1' 
+    ? anio + '-' + mes + '-15'
+    : anio + '-' + mes + '-' + new Date(parseInt(anio), parseInt(mes), 0).getDate();
+  
+  google.script.run
+    .withSuccessHandler(function(d) {
+      if (!d || !d.ok) { toast('Error al cargar jornales'); return; }
+      jornalesData = d;
+      renderJornales(d);
+    })
+    .withFailureHandler(e => toast('Error: ' + e.message))
+    .getLiquidacion(desde + '|' + hasta);
+}
+
+function renderJornales(d) {
+  const empleados = d.empleados || [];
+  const filtrados = cuadrillaFiltro === 'todas' ? empleados : empleados.filter(e => e.cuadrilla === cuadrillaFiltro);
+
+  // KPIs
+  const totalGeneral = filtrados.reduce((s,e) => s+e.total, 0);
+  const totalJornal = filtrados.reduce((s,e) => s+e.totalJornal, 0);
+  const totalComida = filtrados.reduce((s,e) => s+e.totalComida, 0);
+  const totalJornales = filtrados.reduce((s,e) => s+e.jornales, 0);
+  
+  document.getElementById('jornal-kpis').innerHTML = `
+    <div class="metric-card"><label>Total a pagar</label><div class="val" style="color:#1D9E75;font-size:18px">$${Math.round(totalGeneral).toLocaleString('es-AR')}</div></div>
+    <div class="metric-card"><label>Total jornales</label><div class="val" style="font-size:18px">$${Math.round(totalJornal).toLocaleString('es-AR')}</div></div>
+    <div class="metric-card"><label>Total comidas</label><div class="val" style="font-size:18px">$${Math.round(totalComida).toLocaleString('es-AR')}</div></div>
+    <div class="metric-card"><label>Jornales totales</label><div class="val" style="font-size:18px">${totalJornales.toFixed(1)}</div><div class="sub">${filtrados.length} empleados</div></div>
+  `;
+
+  document.getElementById('jornal-total').textContent = '$' + Math.round(totalGeneral).toLocaleString('es-AR');
+
+  // Colores por cuadrilla
+  const cuaColors = {
+    'Roja': {bg:'#FCEBEB',color:'#791F1F'},
+    'Amarilla': {bg:'#FAEEDA',color:'#633806'},
+    'Verde': {bg:'#E1F5EE',color:'#085041'}
+  };
+
+  // Agrupar por cuadrilla
+  let html = '';
+  const cuadrillas = ['Roja','Amarilla','Verde'];
+  cuadrillas.forEach(cua => {
+    const emps = filtrados.filter(e => e.cuadrilla === cua);
+    if (!emps.length) return;
+    const c = cuaColors[cua] || {bg:'#f0f0f0',color:'#333'};
+    html += `<tr style="background:${c.bg}">
+      <td colspan="11" style="font-weight:700;color:${c.color};font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding:6px 10px">
+        ${cua === 'Roja' ? '🔴' : cua === 'Amarilla' ? '🟡' : '🟢'} Cuadrilla ${cua}
+      </td>
+    </tr>`;
+    let subtotalJ = 0, subtotalC = 0, subtotalT = 0;
+    emps.forEach(e => {
+      subtotalJ += e.totalJornal;
+      subtotalC += e.totalComida;
+      subtotalT += e.total;
+      html += `<tr>
+        <td style="font-weight:600">${e.alias}</td>
+        <td><span class="badge" style="background:${c.bg};color:${c.color}">${e.cuadrilla}</span></td>
+        <td style="color:#888;font-size:11px">${e.rol}</td>
+        <td style="text-align:center">${e.servicios}</td>
+        <td style="text-align:center">${e.diasTrabajados}</td>
+        <td style="text-align:center;font-weight:600">${e.jornales.toFixed(1)}</td>
+        <td style="text-align:right;color:#888">$${Math.round(e.jornadaBase).toLocaleString('es-AR')}</td>
+        <td style="text-align:right">$${Math.round(e.totalJornal).toLocaleString('es-AR')}</td>
+        <td style="text-align:right">$${Math.round(e.totalComida).toLocaleString('es-AR')}</td>
+        <td style="text-align:right;font-weight:700;color:#1D9E75">$${Math.round(e.total).toLocaleString('es-AR')}</td>
+        <td style="display:flex;gap:4px">
+          <button class="btn btn-sm" onclick="verDetalleJornal('${e.nombre}')" style="font-size:10px;padding:2px 8px">Ver detalle</button>
+          <button class="btn btn-sm" onclick="abrirFichaEmpleado('${e.id}')" style="font-size:10px;padding:2px 8px">✏️</button>
+        </td>
+      </tr>`;
+    });
+    html += `<tr style="background:#f8f8f8;font-weight:700">
+      <td colspan="7" style="text-align:right;color:#888;font-size:11px">Subtotal ${cua}:</td>
+      <td style="text-align:right">$${Math.round(subtotalJ).toLocaleString('es-AR')}</td>
+      <td style="text-align:right">$${Math.round(subtotalC).toLocaleString('es-AR')}</td>
+      <td style="text-align:right;color:#1D9E75">$${Math.round(subtotalT).toLocaleString('es-AR')}</td>
+      <td></td>
+    </tr>`;
+  });
+
+  document.getElementById('tbody-jornales').innerHTML = html || '<tr><td colspan="11" class="empty">Sin jornales para este período</td></tr>';
+  
+  // Total general
+  document.getElementById('tfoot-jornales').innerHTML = `
+    <tr style="background:#1D9E75;color:#fff">
+      <td colspan="7" style="font-weight:700;padding:8px 10px">TOTAL GENERAL</td>
+      <td style="text-align:right;font-weight:700">$${Math.round(totalJornal).toLocaleString('es-AR')}</td>
+      <td style="text-align:right;font-weight:700">$${Math.round(totalComida).toLocaleString('es-AR')}</td>
+      <td style="text-align:right;font-weight:700;font-size:14px">$${Math.round(totalGeneral).toLocaleString('es-AR')}</td>
+      <td></td>
+    </tr>`;
+}
+
+function filtrarCuadrilla(cua) {
+  cuadrillaFiltro = cua;
+  ['todas','roja','amarilla','verde'].forEach(t => {
+    const btn = document.getElementById('tab-'+t);
+    if (btn) btn.style.opacity = (t === cua.toLowerCase() || (t==='todas' && cua==='todas')) ? '1' : '0.5';
+  });
+  if (jornalesData) renderJornales(jornalesData);
+}
+
+function verDetalleJornal(nombre) {
+  if (!jornalesData) return;
+  const emp = jornalesData.empleados.find(e => e.nombre === nombre);
+  if (!emp) return;
+  document.getElementById('detalle-jornal-nombre').textContent = '📋 Detalle: ' + (emp.alias || emp.nombre);
+  const rows = (emp.detalle || []).map(r => `<tr>
+    <td>${r.fecha}</td>
+    <td style="font-size:11px">${r.empresa}</td>
+    <td style="text-align:center">${r.m2||0}</td>
+    <td style="text-align:center">${r.m3||0}</td>
+    <td style="text-align:center">${r.m2Equiv||'—'}</td>
+    <td style="text-align:center;font-weight:700">${parseFloat(r.jornales||1).toFixed(1)}</td>
+    <td>—</td>
+  </tr>`).join('');
+  document.getElementById('tbody-detalle-jornal').innerHTML = rows || '<tr><td colspan="7" class="empty">Sin servicios</td></tr>';
+  document.getElementById('card-detalle-jornal').style.display = 'block';
+  document.getElementById('card-detalle-jornal').scrollIntoView({behavior:'smooth'});
+}
+
+function sincronizarJotForm() {
+  toast('Sincronizando con JotForm...');
+  google.script.run
+    .withSuccessHandler(r => {
+      if (r.ok) { toast('✓ ' + r.nuevos + ' remitos nuevos sincronizados'); jornalesData=null; cargarJornales(); }
+      else toast('Error al sincronizar');
+    })
+    .withFailureHandler(e => toast('Error: ' + e.message))
+    .sincronizarJotForm();
+}
+
+
+
+function abrirEditarEmpleado(empId) {
+  if (!jornalesData) return;
+  const emp = jornalesData.empleados.find(e => e.id === empId);
+  if (!emp) return;
+  document.getElementById('eemp-id').value = emp.id;
+  document.getElementById('eemp-nombre').value = emp.nombre;
+  document.getElementById('eemp-alias').value = emp.alias;
+  document.getElementById('eemp-jornadabase').value = emp.jornadaBase;
+  document.getElementById('eemp-comida').value = emp.comidaDia;
+  document.getElementById('eemp-cuadrilla').value = emp.cuadrilla;
+  document.getElementById('eemp-rol').value = emp.rol;
+  document.getElementById('modal-editar-empleado').classList.add('open');
+}
+
+function guardarEditarEmpleado() {
+  const d = {
+    ID: document.getElementById('eemp-id').value,
+    NombreJotForm: document.getElementById('eemp-nombre').value,
+    Alias: document.getElementById('eemp-alias').value,
+    JornadaBase: parseFloat(document.getElementById('eemp-jornadabase').value) || 0,
+    ComidaDia: parseFloat(document.getElementById('eemp-comida').value) || 0,
+    Cuadrilla: document.getElementById('eemp-cuadrilla').value,
+    Rol: document.getElementById('eemp-rol').value,
+  };
+  if (!d.NombreJotForm) { toast('El nombre es obligatorio'); return; }
+  google.script.run
+    .withSuccessHandler(r => {
+      if (r.ok) {
+        toast('Empleado actualizado ✓');
+        cerrarModal('modal-editar-empleado');
+        jornalesData = null;
+        cargarJornales();
+      } else toast('Error: ' + (r.error || 'desconocido'));
+    })
+    .withFailureHandler(e => toast('Error: ' + e.message))
+    .editarEmpleado(d);
+}
+
+
+// ── Empleados ──────────────────────────────────────────────
+
+
+
+
+
+
+
+
+window.onload=function(){
+  if(typeof google!=='undefined'&&google.script){
+    cargarDashboard();
+    google.script.run.withSuccessHandler(d=>{clientesData=d;actualizarSelects();}).getClientes();
+  }
+};
+</script>
+
+<!-- MODAL EDITAR EMPRESA -->
+<div class="modal-overlay" id="modal-editar-empresa">
+<div class="modal">
+  <h3>✏️ Editar empresa</h3>
+  <input type="hidden" id="ee-id">
+  <div class="section-divider">Datos de la empresa</div>
+  <div class="form-grid">
+    <div class="form-group"><label>Razón Social</label><input type="text" id="ee-razon"></div>
+    <div class="form-group"><label>CUIT</label><input type="text" id="ee-cuit"></div>
+  </div>
+  <div class="form-grid">
+    <div class="form-group"><label>Condición IVA</label><input type="text" id="ee-condiva" placeholder="Responsable Inscripto"></div>
+    <div class="form-group"><label>Localidad</label><input type="text" id="ee-loc"></div>
+  </div>
+  <div class="form-group" style="margin-bottom:12px"><label>Dirección Fiscal</label><input type="text" id="ee-dir"></div>
+  <div class="form-grid">
+    <div class="form-group"><label>Tel. empresa</label><input type="text" id="ee-tel"></div>
+    <div class="form-group"><label>Email empresa</label><input type="text" id="ee-email"></div>
+  </div>
+  <div class="section-divider">Contacto de cobranza</div>
+  <div class="form-grid-3">
+    <div class="form-group"><label>Nombre</label><input type="text" id="ee-cobrnombre"></div>
+    <div class="form-group"><label>Email</label><input type="text" id="ee-cobremail"></div>
+    <div class="form-group"><label>Teléfono</label><input type="text" id="ee-cobrtel"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-sm" onclick="cerrarModal('modal-editar-empresa')">Cancelar</button>
+    <button class="btn btn-green btn-sm" onclick="guardarEditarEmpresa()">Guardar cambios</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL EDITAR OBRA -->
+<div class="modal-overlay" id="modal-editar-obra">
+<div class="modal">
+  <h3>✏️ Editar obra</h3>
+  <input type="hidden" id="eo-id">
+  <div class="section-divider">Datos de la obra</div>
+  <div class="form-grid">
+    <div class="form-group"><label>Nombre de obra</label><input type="text" id="eo-nombre" placeholder="Ej: French 2611"></div>
+    <div class="form-group"><label>Localidad</label><input type="text" id="eo-loc"></div>
+  </div>
+  <div class="form-group" style="margin-bottom:12px"><label>Dirección</label><input type="text" id="eo-dir"></div>
+  <div class="section-divider">Contacto de obra</div>
+  <div class="form-grid-3">
+    <div class="form-group"><label>Jefe de obra</label><input type="text" id="eo-obranombre"></div>
+    <div class="form-group"><label>Email</label><input type="text" id="eo-obraemail"></div>
+    <div class="form-group"><label>Teléfono</label><input type="text" id="eo-obratel"></div>
+  </div>
+  <div class="section-divider">Presupuesto</div>
+  <div class="form-grid-3">
+    <div class="form-group"><label>N° Presupuesto</label><input type="text" id="eo-pres"></div>
+    <div class="form-group"><label>CAC base</label><input type="text" id="eo-cac" placeholder="Ej: mar-26"></div>
+    <div class="form-group"><label>Mínimo ($)</label><input type="text" id="eo-min"></div>
+  </div>
+  <div class="form-grid-3">
+    <div class="form-group"><label>F+F ($/m²)</label><input type="text" id="eo-fyf"></div>
+    <div class="form-group"><label>Fratazado ($/m²)</label><input type="text" id="eo-frat"></div>
+    <div class="form-group"><label>Regleado ($/m²)</label><input type="text" id="eo-reg"></div>
+  </div>
+  <div class="form-group" style="margin-bottom:12px"><label>Dif. espesor ($/m³)</label><input type="text" id="eo-dif"></div>
+  <div class="modal-footer">
+    <button class="btn btn-sm" onclick="cerrarModal('modal-editar-obra')">Cancelar</button>
+    <button class="btn btn-green btn-sm" onclick="guardarEditarObra()">Guardar cambios</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL AGREGAR OBRA -->
+<div class="modal-overlay" id="modal-agregar-obra">
+<div class="modal">
+  <h3>+ Nueva obra</h3>
+  <input type="hidden" id="ao-empid">
+  <input type="hidden" id="ao-empnombre">
+  <div class="section-divider">Datos de la obra</div>
+  <div class="form-grid">
+    <div class="form-group"><label>Nombre de obra *</label><input type="text" id="ao-nombre" placeholder="Ej: French 2611"></div>
+    <div class="form-group"><label>Localidad</label><input type="text" id="ao-loc"></div>
+  </div>
+  <div class="form-group" style="margin-bottom:12px"><label>Dirección</label><input type="text" id="ao-dir"></div>
+  <div class="section-divider">Contacto de obra</div>
+  <div class="form-grid-3">
+    <div class="form-group"><label>Jefe de obra</label><input type="text" id="ao-obranombre"></div>
+    <div class="form-group"><label>Email</label><input type="text" id="ao-obraemail"></div>
+    <div class="form-group"><label>Teléfono</label><input type="text" id="ao-obratel"></div>
+  </div>
+  <div class="section-divider">Presupuesto</div>
+  <div class="form-grid-3">
+    <div class="form-group"><label>N° Presupuesto</label><input type="text" id="ao-pres"></div>
+    <div class="form-group"><label>CAC base</label><input type="text" id="ao-cac" placeholder="Ej: mar-26"></div>
+    <div class="form-group"><label>Mínimo ($)</label><input type="text" id="ao-min"></div>
+  </div>
+  <div class="form-grid-3">
+    <div class="form-group"><label>F+F ($/m²)</label><input type="text" id="ao-fyf"></div>
+    <div class="form-group"><label>Fratazado ($/m²)</label><input type="text" id="ao-frat"></div>
+    <div class="form-group"><label>Regleado ($/m²)</label><input type="text" id="ao-reg"></div>
+  </div>
+  <div class="form-group" style="margin-bottom:12px"><label>Dif. espesor ($/m³)</label><input type="text" id="ao-dif"></div>
+  <div class="modal-footer">
+    <button class="btn btn-sm" onclick="cerrarModal('modal-agregar-obra')">Cancelar</button>
+    <button class="btn btn-green btn-sm" onclick="guardarAgregarObra()">Agregar obra</button>
+  </div>
+</div>
+</div>
+
+
+<!-- MODAL EDITAR EMPLEADO -->
+<div class="modal-overlay" id="modal-editar-empleado">
+<div class="modal">
+  <h3>✏️ Editar empleado</h3>
+  <input type="hidden" id="eemp-id">
+  <div class="section-divider">Datos del empleado</div>
+  <div class="form-grid">
+    <div class="form-group"><label>Nombre (tal como aparece en JotForm)</label><input type="text" id="eemp-nombre"></div>
+    <div class="form-group"><label>Alias (nombre corto en liquidación)</label><input type="text" id="eemp-alias"></div>
+  </div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label>Cuadrilla</label>
+      <select id="eemp-cuadrilla" style="width:100%;padding:7px 10px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+        <option value="Roja">🔴 Roja</option>
+        <option value="Amarilla">🟡 Amarilla</option>
+        <option value="Verde">🟢 Verde</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Rol</label>
+      <select id="eemp-rol" style="width:100%;padding:7px 10px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+        <option value="Capataz">Capataz</option>
+        <option value="Oficial">Oficial</option>
+        <option value="Ayudante">Ayudante</option>
+      </select>
+    </div>
+  </div>
+  <div class="section-divider">Valores de liquidación</div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label>Jornal base ($ por jornal)</label>
+      <input type="number" id="eemp-jornadabase" placeholder="Ej: 2937">
+      <small style="color:#888;font-size:10px">Valor de 1 jornal completo</small>
+    </div>
+    <div class="form-group">
+      <label>Comida ($ por día trabajado)</label>
+      <input type="number" id="eemp-comida" placeholder="Ej: 6630">
+      <small style="color:#888;font-size:10px">Fijo por día, sin importar cantidad de jornales</small>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-sm" onclick="cerrarModal('modal-editar-empleado')">Cancelar</button>
+    <button class="btn btn-green btn-sm" onclick="guardarEditarEmpleado()">Guardar cambios</button>
+  </div>
+</div>
+</div>
+
+
+</body>
+</html>
